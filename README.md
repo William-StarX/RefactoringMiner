@@ -2,7 +2,19 @@
 
 独立、可安装、可被不同 Agent 调用的 Java 分析组件。比较 Git 工作区、两个提交或两个源码目录，返回重构、AST 编辑、文本差异和来源证据。
 
-这是基于作者库的定制适配项目，**不是作者官方仓库，也不是其完整镜像**。SDK/服务版本 **1.4.0**，结果接口 **1.0**。保留已有 1.2 分析引擎和两处等价优化，详见 [来源与许可](NOTICE.md)。
+这是基于作者库的定制适配项目，**不是作者官方仓库，也不是其完整镜像**。SDK/服务版本 **1.5.0**，结果接口 **1.0**。保留已有 1.2 分析引擎和两处等价优化，详见 [来源与许可](NOTICE.md)。
+
+## 在关键阶段主动调用
+
+1.5 增加可安装 Skill 和 MCP 服务指引：Agent 在 Java 审查、完成一批 Java 改动/修复、交付候选前主动收集审查证据；后续修改使原报告过期时重新审查。完整规则通过 MCP 初始化返回，也包含在 `describe` / HTTP `/tools` 的 `instructions`、`checkpoints` 字段中。
+
+安装后，为支持 Skill 的宿主导出技能（下面是 Codex 项目目录示例，也可指定当前宿主实际使用的用户级技能目录）：
+
+```sh
+refactoringminer-agent install-skill --destination .agents/skills
+```
+
+可加 `--java-home`、`--cache-dir` 绑定已有运行环境。安装器不覆盖已有 Skill；本机路径只保存到导出目录中的 `runtime.local.json`，不要提交该文件。Skill 允许隐式调用，用户无需每轮再次点名。MCP 使用者重新连接服务后获得同样规则。[阶段规则与接入边界](docs/WORKFLOW.md) · [1.5 验证记录](docs/WORKFLOW_VERIFICATION.md)。
 
 ## 快速使用
 

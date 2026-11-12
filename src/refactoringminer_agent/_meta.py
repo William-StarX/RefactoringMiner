@@ -1,4 +1,4 @@
-VERSION = '1.4.0'
+VERSION = '1.5.0'
 DISTRIBUTION = 'refactoringminer-agent'
 MODULE = 'refactoringminer_agent'
 SERVER_NAME = 'refactoringminer-agent'

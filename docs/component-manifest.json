@@ -1,0 +1,45 @@
+{
+  "component": "refactoringminer-review",
+  "files": [
+    {
+      "path": "src/refactoringminer_agent/_vendor/components/refactoringminer-review/assets/java/pom.xml",
+      "sha256": "b0abce80c94e1d59cfd9bece122190f4244386d452b87127926aef5593d5f454",
+      "matches_component_1_2_0": true
+    },
+    {
+      "path": "src/refactoringminer_agent/_vendor/components/refactoringminer-review/assets/java/src/main/java/gr/uom/java/xmi/decomposition/ReplacementUtil.java",
+      "sha256": "4ec321dfa1a07d465f42cef37f4711c1bcf6d4cdc55c2bc434fa8b9110991092",
+      "matches_component_1_2_0": true
+    },
+    {
+      "path": "src/refactoringminer_agent/_vendor/components/refactoringminer-review/assets/java/src/main/java/gr/uom/java/xmi/diff/StringDistance.java",
+      "sha256": "105e6ba5d073f6dd65341b521ff7e505466860b771cfa6351d51332ab0481a3d",
+      "matches_component_1_2_0": true
+    },
+    {
+      "path": "src/refactoringminer_agent/_vendor/components/refactoringminer-review/assets/java/src/main/java/local/skills/review/ReviewEngine.java",
+      "sha256": "b6efd70384703867a3fb97ded1bb9c84d74fcf718ec2c15cd0f4ceff7304b86a",
+      "matches_component_1_2_0": true
+    },
+    {
+      "path": "src/refactoringminer_agent/_vendor/components/refactoringminer-review/assets/java/src/main/resources/META-INF/LICENSE.RefactoringMiner",
+      "sha256": "039b9b04be8ea57cd002b4d15d16e6d53448c6ad8ed97dd73970f42954f2a44b",
+      "matches_component_1_2_0": true
+    },
+    {
+      "path": "src/refactoringminer_agent/_vendor/components/refactoringminer-review/scripts/reporting.py",
+      "sha256": "3816e10abe2d8c0b2454adf09551416431999e495b141792f930566133488eed",
+      "matches_component_1_2_0": true
+    },
+    {
+      "path": "src/refactoringminer_agent/_vendor/components/refactoringminer-review/scripts/review.py",
+      "sha256": "b2d743c58e4b3ee23bed0f8268313fd7b01a232eb567b35d2d92a556660cc57c",
+      "matches_component_1_2_0": true
+    },
+    {
+      "path": "src/refactoringminer_agent/_vendor/components/refactoringminer-review/scripts/runtime.py",
+      "sha256": "f8b621ddb69010bcdd89613cfa6819bb75f08df65be712ddc51319fffac1468d",
+      "matches_component_1_2_0": true
+    }
+  ]
+}

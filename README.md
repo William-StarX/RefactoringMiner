@@ -4,35 +4,11 @@ SDK / 服务 **1.5.0** · 结果接口 **1.0** · RefactoringMiner **3.0.11**
 
 SDK / service **1.5.0** · Result interface **1.0** · RefactoringMiner **3.0.11**
 
-RefactoringMiner Agent 用于 **Java 代码审查**。它把重命名、移动、方法提取等重构，与具体的语法修改和文本差异一起列出来，方便 Agent 顺着变化检查代码。
+让 Agent 审查 Java 补丁时，同时看到重构、语法修改和文本差异。传入工作区、两个提交或两个源码目录，即可取得带代码位置和版本信息的 JSON 报告，用于检查改动、核对调用方和补充测试。
 
-RefactoringMiner Agent is a **Java code review tool for agents**. It reports renames, moves, and method extractions alongside syntax edits and text diffs, so an agent can follow the code through a patch.
+Give an agent refactorings, syntax edits, and text diffs when reviewing a Java patch. Pass a worktree, two commits, or two source directories to get a JSON report with source locations and revision details for inspecting changes, checking callers, and adding tests.
 
-比如，一次补丁把校验逻辑提取成新方法，也顺手改了一个边界条件。审查时既要跟上方法的位置变化，也要看清条件究竟改了什么。本项目调用 RefactoringMiner，将重构、抽象语法树（AST）编辑和代码位置整理成 JSON，供 Agent 检查调用方、对照需求和补充测试。
-
-A patch might extract validation into a new method and also adjust a boundary condition. Reviewing it means following the relocated code and checking exactly how that condition changed. This project calls RefactoringMiner and returns the refactorings, abstract syntax tree (AST) edits, and source locations as JSON. An agent can use them to inspect callers, check requirements, and add tests.
-
-## 适合放在代码审查这一步<br>Where it fits in a review
-
-Agent 完成一批实现、重构或缺陷修复后，可以把当前改动交给它分析。审查对象有三种：
-
-Use it after an agent finishes a batch of implementation work, a refactoring, or a bug fix. It accepts three kinds of input:
-
-| 要审查的内容<br>Changes to review | 调用方式<br>Call |
-|---|---|
-| 尚未提交的修改，包括暂存区与工作区<br>Uncommitted changes in the index and worktree | `review(repo, base=...)` |
-| 两个提交之间的最终变化<br>Final differences between two commits | `review(repo, base=..., head=...)` |
-| 修改前后的源码目录<br>Before/after source directories | `directories(before, after)` |
-
-报告保留具体位置、版本或内容指纹，Agent 可以据此回到源码检查调用方、核对需求，并选择需要补充的测试。
-
-Reports retain locations and revisions or content fingerprints. The agent can use them to inspect callers, check requirements, and choose tests to add.
-
-这层封装省去了 Agent 自己准备源码快照、调用 Java 库和转换结果格式的工作，可以通过 Python、命令行、MCP 或 HTTP 使用。若还需要追查某段代码的来历，可另外使用 [CodeTracker Agent](https://github.com/William-StarX/Tracker)。
-
-The wrapper handles source snapshots, Java invocation, and result formatting. Agents can use it through Python, the command line, MCP, or HTTP. For questions about how a piece of code evolved, see the separate [CodeTracker Agent](https://github.com/William-StarX/Tracker).
-
-## 审查工作区、提交或目录<br>Review a worktree, commits, or directories
+## 快速开始<br>Quick start
 
 运行环境为 **Python 3.11+、Java 17+**；源码安装和仓库比较使用 Git，目录比较直接读取源码目录。首次准备引擎需要 **JDK 和网络**。基础 SDK 使用 Python 标准库。
 
@@ -90,7 +66,23 @@ refactoringminer-agent call --request request.json
 
 `call` also accepts standard input. `describe` returns tool parameters, response schemas, and checkpoint guidance.
 
-## 让 Agent 在交付前检查改动<br>Make review part of the agent's workflow
+## 选择审查范围<br>Choose what to review
+
+Agent 完成一批实现、重构或缺陷修复后，可以把当前改动交给它分析。审查对象有三种：
+
+Use it after an agent finishes a batch of implementation work, a refactoring, or a bug fix. It accepts three kinds of input:
+
+| 要审查的内容<br>Changes to review | 调用方式<br>Call |
+|---|---|
+| 尚未提交的修改，包括暂存区与工作区<br>Uncommitted changes in the index and worktree | `review(repo, base=...)` |
+| 两个提交之间的最终变化<br>Final differences between two commits | `review(repo, base=..., head=...)` |
+| 修改前后的源码目录<br>Before/after source directories | `directories(before, after)` |
+
+若需要先调查某段代码的来历，可使用 [TraceTrail](https://github.com/William-StarX/Tracker) 追踪历史，再回来审查补丁。
+
+To investigate how a piece of code evolved, use [TraceTrail](https://github.com/William-StarX/Tracker) before reviewing the patch.
+
+## 接入 Agent，在交付前审查<br>Connect an agent and review before delivery
 
 提供四种调用入口：Python `Client` / `HTTPClient`、JSON CLI、MCP stdio / Streamable HTTP，以及认证 HTTP API。HTTP/MCP 服务需安装可选依赖：
 
@@ -149,7 +141,7 @@ refactoringminer-agent http --root /path/to/repo --port 8765
 
 The service binds to `127.0.0.1` and exposes `/health`, `/tools`, `/invoke`, and `/mcp` with Bearer authentication. Set `--root` to a regular independent clone. For access from another machine, connect through a trusted TLS channel and use server-side paths. See the [API](docs/API.md).
 
-## 获取报告和调整开销<br>Get reports and manage resource use
+## 读取结果与控制开销<br>Read results and set limits
 
 调用返回 `status` 和 `result`：前者为 `ok`、`partial` 或 `error`，后者保存组件报告。默认完整返回；需要简短响应时，可设置 `format="compact"`，并通过 `output` 将完整报告保存到分析项目之外的新文件。服务模式同时配置 `--output-root`。
 
@@ -159,11 +151,29 @@ Java 按请求启动，每个 Client / 服务实例同时执行一项分析，�
 
 Java starts per request. Each Client / service instance handles one analysis at a time and returns `BUSY` while occupied. The default Java heap ceiling is 2048 MiB, adjustable with `memory_mb`. See the [API](docs/API.md) for parameters and result fields.
 
+## 本项目新增的工作<br>What this project adds
+
+- **把一次审查的材料放到一起。** 自动准备源码快照，将重构、AST 编辑、文本差异、代码位置和输入指纹整理到同一报告，方便 Agent 对照具体改动给出意见。
+
+  **Keep the review evidence together.** The wrapper prepares source snapshots and collects refactorings, AST edits, text diffs, locations, and input fingerprints in one report, so an agent can tie its findings to the actual changes.
+
+- **让接入和报告交接更省事。** Python SDK、JSON CLI、MCP 和 HTTP 共用参数与结果约定；可按宿主选择入口，用简短响应配合完整报告文件，把证据传给下一步任务。各入口的结果一致性已在 [真实项目上核验](docs/VERIFICATION.md)。
+
+  **Simplify integration and handoff.** The Python SDK, JSON CLI, MCP, and HTTP share argument and result conventions. Choose the entry point that fits the host, then pass a compact response and full report file to the next task. Result consistency across these entry points has been [checked on a real project](docs/VERIFICATION.md).
+
+- **把审查安排到开发流程中。** Skill 和 MCP 指引覆盖实现完成、缺陷修复后和交付前等阶段，并说明何时复用已有报告、何时重新分析，便于 Agent 在一个项目中持续使用。
+
+  **Make review part of the development workflow.** Skill and MCP instructions cover implementation, bug fixes, and delivery, including when to reuse a report and when to run a fresh analysis, so an agent can keep using the tool throughout a project.
+
+此外，本项目对 Git 读取、AST 行号定位和字符串辅助计算做了局部优化，减少重复进程与临时分配。引擎缓存可复用，Java 按请求启动；基础 Python SDK 使用标准库。修改来源见 [NOTICE](NOTICE.md)。
+
+Local optimizations also reduce repeated Git processes, AST line-lookup work, and temporary allocations in string helpers. Prepared engines are cached, Java starts per request, and the base Python SDK uses the standard library. See [NOTICE](NOTICE.md) for provenance.
+
 ## RefactoringMiner 与相关论文<br>RefactoringMiner and the research behind it
 
-核心分析基于作者的 [tsantalis/RefactoringMiner](https://github.com/tsantalis/RefactoringMiner)，固定使用 Maven `com.github.tsantalis:refactoring-miner:3.0.11`。相关研究包括：
+本项目采用重构感知的差异分析思路，重构识别与 AST 匹配调用作者的 [tsantalis/RefactoringMiner](https://github.com/tsantalis/RefactoringMiner)，固定使用 Maven `com.github.tsantalis:refactoring-miner:3.0.11`。相关研究包括：
 
-Core analysis uses the authors' [tsantalis/RefactoringMiner](https://github.com/tsantalis/RefactoringMiner), pinned to Maven `com.github.tsantalis:refactoring-miner:3.0.11`. Relevant research includes:
+This project builds on refactoring-aware differencing. Refactoring detection and AST matching use the authors' [tsantalis/RefactoringMiner](https://github.com/tsantalis/RefactoringMiner), pinned to Maven `com.github.tsantalis:refactoring-miner:3.0.11`. Relevant research includes:
 
 1. **AST 差异分析** — Pouria Alikhanifard, Nikolaos Tsantalis. *A Novel Refactoring and Semantic Aware Abstract Syntax Tree Differencing Tool and a Benchmark for Evaluating the Accuracy of Diff Tools*. **ACM Transactions on Software Engineering and Methodology (TOSEM)**, 34(2), Article 40, **2025 年 2 月正式卷期**. [DOI: 10.1145/3696002](https://doi.org/10.1145/3696002)。这是本组件 AST 差异能力的主要研究依据。
 
@@ -180,16 +190,6 @@ Core analysis uses the authors' [tsantalis/RefactoringMiner](https://github.com/
 更多研究资料见 [作者的引用说明](https://github.com/tsantalis/RefactoringMiner/blob/master/documentation/research.md)。
 
 Further research material is available in the [authors' citation guide](https://github.com/tsantalis/RefactoringMiner/blob/master/documentation/research.md).
-
-## 封装与来源<br>About this wrapper
-
-重构识别和 AST 分析来自 RefactoringMiner。本项目负责快照准备、Java 调用和报告输出，并提供 SDK、服务和 Skill，将分析接入 Agent 的审查流程。
-
-Refactoring detection and AST analysis come from RefactoringMiner. This project handles snapshots, Java invocation, and report output, with an SDK, services, and Skill to bring that analysis into an agent's review workflow.
-
-分析引擎包含 `StringDistance.java` 和 `ReplacementUtil.keepReservedTokens` 两处经差分测试的局部优化，用于减少字符串计算和临时对象分配。
-
-The engine includes two local optimizations checked by differential tests: `StringDistance.java` and `ReplacementUtil.keepReservedTokens`. They reduce string computation and temporary object allocation.
 
 ## 注意事项<br>Attention
 

@@ -78,9 +78,9 @@ Use it after an agent finishes a batch of implementation work, a refactoring, or
 | 两个提交之间的最终变化<br>Final differences between two commits | `review(repo, base=..., head=...)` |
 | 修改前后的源码目录<br>Before/after source directories | `directories(before, after)` |
 
-若需要先调查某段代码的来历，可使用 [TraceTrail](https://github.com/William-StarX/Tracker) 追踪历史，再回来审查补丁。
+若需要先调查某段代码的来历，可使用 [TraceTrail](https://github.com/William-StarX/TraceTrail) 追踪历史，再回来审查补丁。
 
-To investigate how a piece of code evolved, use [TraceTrail](https://github.com/William-StarX/Tracker) before reviewing the patch.
+To investigate how a piece of code evolved, use [TraceTrail](https://github.com/William-StarX/TraceTrail) before reviewing the patch.
 
 ## 接入 Agent，在交付前审查<br>Connect an agent and review before delivery
 
